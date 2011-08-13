@@ -11,6 +11,7 @@ class Index(object):
             dup = faculty_collection.find_one({"uni":uni})
             if dup:
                 #already in DB
+                #TODO
                 raise ValueError("Duplicate uni!")
             else:
                 #new uni
@@ -24,6 +25,7 @@ class Index(object):
                     pass
         else:
             #redirect to registration
+            #TODO
             pass
         
     faculty_signup.exposed = True
@@ -45,94 +47,142 @@ class Index(object):
             else:
                 #already in DB
                 #error is not the best way to handle
+                #TODO
                 raise ValueError("duplicate uni found--already in DB")
             
         else:
             #redirect to registration
+            #TODO
             pass
     student_signup.exposed = True
 
-    def test1(self):
-        print "Interprets correctly"
+    def create_appointment(self, date = 0, month = 0, year = 0, num=0, time = 0, dur = 0):
+        #time is military, in minute e.g. 2PM would be 1400
+        #duration is in minutes
+        #TODO: Ensure that only professor can create appointment, and set prof_uni to it
+        #TODO: Make sure professor exists
+        DEFAULT = "mnn2104"
 
-    def test2(self):
+        prof_uni = DEFAULT
+        if num > 0 and date > 0 and month > 0 and year > 0 and len(prof_uni) > 0:
+            apptment_collection = db.appts
+            faculty_collection = db.faculty
+            query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni}
+            appts = apptment_collection.find(query)
+            bad_appts = []
+            dur_hours = dur / 60
+            dur_minutes = dur - dur_hours * 60
+            for appt in appts:
+                appt_time = appt["time"]
+                appt_dur = appt["dur"]
+                appt_dur_hours = appt_dur / 60
+                appt_dur_minutes = dur - appt_dur_hours * 60
+
+                this_appt_in_other_appt = (appt_time < time + dur_hours * 100 + dur_minutes and time <= appt_time)
+                other_appt_in_this_appt = (time < appt_time + appt_dur_hours * 100 + appt_dur_minutes and  appt_time <= time)
+                if this_appt_in_other_appt or other_appt_in_this_appt:
+                    bad_appts.append(appt)
+            if bad_appts:
+                #duplicate found
+                #TODO should be handled more gracefully
+                #redirect to registration
+                raise ValueError("already have a date at this time")
+
+            faculty = faculty_collection.find_one()
+            if not faculty:
+                #TODO should be handled more gracefully
+                #redirect to registration
+                raise ValueError("already have a date at this time")
+
+            db_obj = {"date":date, "month":month, "year":year, "num":num, "prof_uni" : prof_uni}
+            try:
+                insertion = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni, "time":time, "dur":dur, "num": num}
+                apptment_collection.insert(insertion, safe=True)
+                return True
+            except pymongo.errors.OperationFailure:
+                #pymongo problem
+                pass
+            except:
+                #other problem
+                pass                
+        else:
+            #TODO
+            #redirect to registration
+            #input error
+            pass
+
+    def select_appointment(self, date = 0, month = 0, year = 0, prof_uni = "", time = 0):
+        #time is military, in minute e.g. 2PM would be 1400
+        #duration is in minutes
+        #TODO: pull in student uni from cookie
+        #TODO: make sure student exists
+        DEFAULT = "mnn2104"
+        student_uni = DEFAULT
+        if date > 0 and month > 0 and year > 0 and len(prof_uni) and len(student_uni) > 0:
+            apptment_collection = db.appts
+            student_collection = db.student
+            query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni, "time": time}
+            appt = apptment_collection.find_one(query)
+            student = student_collection.find_one({"uni":student_uni})
+            if not student or not appt or appt["num"] == 0:
+                #appointment invalid
+                #TODO should be handled more gracefully
+                #redirect to registration
+                raise ValueError("invalid appointment")
+            try:
+                update = {"$push": {"students":student_uni}, "$inc":{"num" : -1}}
+                apptment_collection.update(query, update, safe=True)
+                return True
+            except pymongo.errors.OperationFailure:
+                #pymongo problem
+                pass
+            except:
+                #other problem
+                pass                
+        else:
+            #TODO
+            #input error
+            #redirect to registration
+            pass
+
+    def display_faculty(self):
         faculty_collection = db.faculty
         fac_lst = faculty_collection.find()
         stri = ""
         for fac in fac_lst:
             stri += str(fac)
-        print "Contents of faculty collection: " + stri
+        if stri:
+            print "Contents of faculty collection: " + stri
+        else:
+            print "Faculty collection empty"
 
-    def test3(self):
+    def display_students(self):
         student_collection = db.student
         stu_lst = student_collection.find()
         stri = ""
         for stu in stu_lst:
             stri += str(stu)
-        print "Contents of student collection: " + stri
-
-    def test4(self):
-        print "faculty join test"
-        self.faculty_signup("Moses","Nakamura","mnn2104")
-        
-        faculty_collection = db.faculty
-        self.user_finder("mnn2104",faculty_collection)
-        faculty_collection.remove({"uni":"mnn2104"})
-        self.user_finder("mnn2104",faculty_collection)
-
-    def test5(self):
-        print "student join test"
-        self.student_signup("Moses","Nakamura","mnn2104")
-        
-        student_collection = db.student
-        self.user_finder("mnn2104",student_collection)
-        student_collection.remove({"uni":"mnn2104"})
-        self.user_finder("mnn2104",student_collection)
-
-    def test6(self):
-        print "faculty already in db test"
-        self.faculty_signup("Moses","Nakamura","mnn2104")
-        try:
-            self.faculty_signup("Moses","Nakamura","mnn2104")
-            print "Should have thrown an exception"
-        except ValueError:
-            print "Success!"
-        except:
-            print "Something else is failing test 6"
-
-
-    def test7(self):
-        print "student already in db test"
-        self.student_signup("Moses","Nakamura","mnn2104")
-        try:
-            self.student_signup("Moses","Nakamura","mnn2104")
-            print "Should have thrown an exception"
-        except ValueError:
-            print "Success!"
-        except:
-            print "Something else is failing test 6"
+        if stri:
+            print "Contents of student collection: " + stri
+        else:
+            print "Student collection empty"
 
     def clear(self):
         db.faculty.drop()
         db.student.drop()
+        db.appts.drop()
 
     def user_finder(self,uni,collection):
         if collection.find_one({"uni":uni}):
-            print "found user"
+            return True
         else:
-            print "didn't find user"
+            return False
 
-    def test_suite(self):
-        self.test1()
-        self.test2()
-        self.test3()
-        self.test4()
-        self.test5()
-        self.test6()
-        self.test7()
-        self.test2()
-
-index = Index()    
-index.clear()
-index.test_suite()
+    def display_apptments(self):
+        apptment_collection = db.appts
+        appt_lst = apptment_collection.find()
+        stri = ""
+        for appt in appt_lst:
+            stri += str(appt)
+        print "Contents of appointment collection: " + stri
 

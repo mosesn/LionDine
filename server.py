@@ -1,5 +1,5 @@
-import cherrypy
 from pymongo import Connection
+#from sendgmail import 
 import pymongo
 connection = Connection()
 db = connection.liondine
@@ -11,7 +11,7 @@ class Index(object):
             dup = faculty_collection.find_one({"uni":uni})
             if dup:
                 #already in DB
-                pass
+                raise ValueError("Duplicate uni!")
             else:
                 #new uni
                 try:
@@ -100,6 +100,18 @@ class Index(object):
         except:
             print "Something else is failing test 6"
 
+
+    def test7(self):
+        print "student already in db test"
+        self.student_signup("Moses","Nakamura","mnn2104")
+        try:
+            self.student_signup("Moses","Nakamura","mnn2104")
+            print "Should have thrown an exception"
+        except ValueError:
+            print "Success!"
+        except:
+            print "Something else is failing test 6"
+
     def clear(self):
         db.faculty.drop()
         db.student.drop()
@@ -110,15 +122,17 @@ class Index(object):
         else:
             print "didn't find user"
 
-    def testSuite(self):
+    def test_suite(self):
         self.test1()
         self.test2()
         self.test3()
         self.test4()
         self.test5()
         self.test6()
+        self.test7()
         self.test2()
-        self.clear()
 
 index = Index()    
-index.testSuite()
+index.clear()
+index.test_suite()
+

@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Appointment Sign Up</title>
+  </head>
+  <body>
+    <h1>Appointments</h1>
+    <ul>
+      <li tal:repeat="appt appts">
+	<a href="../signup/${appt['_id']}">${faculty[appt['prof_uni']][0]} ${faculty[appt['prof_uni']][1]}
+	</a>
+	<br />
+	Day: ${appt["month"]}/${appt["date"]}/${appt["year"]}
+	<br />
+	Time: ${appt["time"]}
+	<br />
+	Duration: ${appt["dur"]}
+      </li>
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Faculty Sign Up</title>
+  </head>
+  <body>
+    <h1>Faculty Registration</h1>
+    <p>If you're a student, instead join <a href="./student">here!</a></p>
+    <form action="./faculty_join" method="post">
+      <p>
+	<label for="firstname">First Name: </label>
+	<input type="text" name="firstname" /><br />
+	<label for="lastname">Last Name: </label>
+	<input type="text" name="lastname" /><br />
+	<label for="uni">Columbia UNI: </label>
+	<input type="text" name="uni" /><br />
+	<INPUT type="submit" value="Send"> <INPUT type="reset">
+      </p>
+    </form>
+  </body>
+</html>

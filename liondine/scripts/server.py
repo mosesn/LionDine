@@ -1,10 +1,11 @@
 from pymongo import Connection
+from liondine.secret import MONGO_URL
 #from sendgmail import 
 import pymongo
-connection = Connection()
-db = connection.liondine
 
 def faculty_signup(firstname="",lastname="",uni=""):
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     if firstname and lastname and uni:
         faculty_collection = db.users
         dup = faculty_collection.find_one({"uni":uni})
@@ -29,6 +30,8 @@ def faculty_signup(firstname="",lastname="",uni=""):
         return False
         
 def student_signup(firstname="",lastname="",uni=""):
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     if firstname and lastname and uni:
         student_collection = db.users
         dup = student_collection.find_one({"uni":uni})
@@ -60,6 +63,8 @@ def create_appointment(uni, date = 0, month = 0, year = 0, num=0, time = 0, dur 
         #TODO: Ensure that only professor can create appointment, and set prof_uni to it
         #TODO: Make sure professor exists
     prof_uni = uni
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     if num > 0 and date > 0 and month > 0 and year > 0 and len(prof_uni) > 0:
         apptment_collection = db.appts
         faculty_collection = db.users
@@ -116,6 +121,8 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
         #TODO: pull in student uni from cookie
         #TODO: make sure student exists
     student_uni = uni
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     if date > 0 and month > 0 and year > 0 and len(prof_uni) and len(student_uni) > 0:
         apptment_collection = db.appts
         student_collection = db.users
@@ -144,6 +151,8 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
         pass
 
 def display_faculty():
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     faculty_collection = db.users
     fac_lst = faculty_collection.find({"type":"faculty"})
     stri = ""
@@ -155,6 +164,8 @@ def display_faculty():
         print "Faculty collection empty"
 
 def display_students():
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     student_collection = db.users
     stu_lst = student_collection.find({"type":"student"})
     stri = ""
@@ -166,6 +177,8 @@ def display_students():
         print "Student collection empty"
 
 def clear():
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     db.users.drop()
     db.appts.drop()
 
@@ -176,6 +189,8 @@ def user_finder(uni,collection):
         return False
 
 def display_apptments():
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
     apptment_collection = db.appts
     appt_lst = apptment_collection.find()
     stri = ""

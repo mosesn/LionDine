@@ -18,6 +18,7 @@ from pyramid.security import remember
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from mongauth import Mongauth
+from secret import MONGO_URL
 
 import pprint
 
@@ -69,7 +70,7 @@ def student_register(request):
 
 @view_config(route_name="appts", renderer="templates/appts.pt", permission="register")
 def appointment_view(request):
-    connection = Connection()
+    connection = Connection(MONGO_URL)
     db = connection.liondine
     apptment_collection = db.appts
     appt_cursor = apptment_collection.find({"num":{"$gt":0}})
@@ -98,7 +99,7 @@ def signup(request):
     match = request.matchdict
     event_id = match["mongoid"]
 
-    connection = Connection()
+    connection = Connection(MONGO_URL)
     db = connection.liondine
     apptment_collection = db.appts
     query = apptment_collection.find_one({"_id": ObjectId(event_id)})
@@ -162,10 +163,10 @@ def st_auth(request):
         return HTTPFound(location="../st_login")
 
 def auth(username, pw):
-    auth = Mongauth(Connection().liondine.auth)
+    auth = Mongauth(Connection(MONGO_URL).liondine.auth)
     return auth.auth(username,pw)
 
 def register(username, pw):
-    auth_coll = Connection().liondine.auth
+    auth_coll = Connection(MONGO_URL).liondine.auth
     auth = Mongauth(auth_coll)
     return auth.new(username,pw)

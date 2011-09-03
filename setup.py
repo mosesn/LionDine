@@ -15,7 +15,7 @@ requires = [
     'WebError',
     'pymongo',
     'mongauth',
-    'bcrypt',
+    'py-bcrypt',
     ]
 
 if sys.version_info[:3] < (2,5,0):

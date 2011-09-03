@@ -5,4 +5,4 @@ zope.sqlalchemy
 WebError
 pymongo
 mongauth
-bcrypt
+py-bcrypt

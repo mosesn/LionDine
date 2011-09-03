@@ -6,7 +6,7 @@ db = connection.liondine
 
 def faculty_signup(firstname="",lastname="",uni=""):
     if firstname and lastname and uni:
-        faculty_collection = db.faculty
+        faculty_collection = db.users
         dup = faculty_collection.find_one({"uni":uni})
         if dup:
                 #already in DB
@@ -15,7 +15,7 @@ def faculty_signup(firstname="",lastname="",uni=""):
         else:
                 #new uni
             try:
-                faculty_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni},safe=True)
+                faculty_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni, "type":"faculty"},safe=True)
                 return True
             except pymongo.errors.OperationFailure:
                     #pymongo problem
@@ -30,12 +30,12 @@ def faculty_signup(firstname="",lastname="",uni=""):
         
 def student_signup(firstname="",lastname="",uni=""):
     if firstname and lastname and uni:
-        student_collection = db.student
+        student_collection = db.users
         dup = student_collection.find_one({"uni":uni})
         if dup == None:
                 #new uni
             try:
-                student_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni},safe=True)
+                student_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni,"type":"student"},safe=True)
                 return True
             except pymongo.errors.OperationFailure:
                     #pymongo problem
@@ -54,17 +54,15 @@ def student_signup(firstname="",lastname="",uni=""):
             #TODO
         return False
 
-def create_appointment( date = 0, month = 0, year = 0, num=0, time = 0, dur = 0):
+def create_appointment(uni, date = 0, month = 0, year = 0, num=0, time = 0, dur = 0):
         #time is military, in minute e.g. 2PM would be 1400
         #duration is in minutes
         #TODO: Ensure that only professor can create appointment, and set prof_uni to it
         #TODO: Make sure professor exists
-    DEFAULT = "mnn2104"
-
-    prof_uni = DEFAULT
+    prof_uni = uni
     if num > 0 and date > 0 and month > 0 and year > 0 and len(prof_uni) > 0:
         apptment_collection = db.appts
-        faculty_collection = db.faculty
+        faculty_collection = db.users
         query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni}
         appts = apptment_collection.find(query)
         bad_appts = []
@@ -90,7 +88,7 @@ def create_appointment( date = 0, month = 0, year = 0, num=0, time = 0, dur = 0)
         if not faculty:
                 #TODO should be handled more gracefully
                 #redirect to registration
-            raise ValueError("already have a date at this time")
+            raise ValueError("no faculty")
 
         db_obj = {"date":date, "month":month, "year":year, "num":num, "prof_uni" : prof_uni}
         try:
@@ -109,22 +107,21 @@ def create_appointment( date = 0, month = 0, year = 0, num=0, time = 0, dur = 0)
             #input error
         return False
 
-def select_dict( dicty):
-    return select_appointment(dicty["date"],dicty["month"],dicty["year"],dicty["prof_uni"], dicty["time"])
+def select_dict(uni, dicty):
+    return select_appointment(uni, dicty["date"],dicty["month"],dicty["year"],dicty["prof_uni"], dicty["time"])
 
-def select_appointment( date = 0, month = 0, year = 0, prof_uni = "", time = 0):
+def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time = 0):
         #time is military, in minute e.g. 2PM would be 1400
         #duration is in minutes
         #TODO: pull in student uni from cookie
         #TODO: make sure student exists
-    DEFAULT = "mnn2104"
-    student_uni = DEFAULT
+    student_uni = uni
     if date > 0 and month > 0 and year > 0 and len(prof_uni) and len(student_uni) > 0:
         apptment_collection = db.appts
-        student_collection = db.student
+        student_collection = db.users
         query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni, "time": time}
         appt = apptment_collection.find_one(query)
-        student = student_collection.find_one({"uni":student_uni})
+        student = student_collection.find_one({"uni":student_uni,"type":"student"})
         if not student or not appt or appt["num"] == 0:
                 #appointment invalid
                 #TODO should be handled more gracefully
@@ -147,8 +144,8 @@ def select_appointment( date = 0, month = 0, year = 0, prof_uni = "", time = 0):
         pass
 
 def display_faculty():
-    faculty_collection = db.faculty
-    fac_lst = faculty_collection.find()
+    faculty_collection = db.users
+    fac_lst = faculty_collection.find({"type":"faculty"})
     stri = ""
     for fac in fac_lst:
         stri += str(fac)
@@ -158,8 +155,8 @@ def display_faculty():
         print "Faculty collection empty"
 
 def display_students():
-    student_collection = db.student
-    stu_lst = student_collection.find()
+    student_collection = db.users
+    stu_lst = student_collection.find({"type":"student"})
     stri = ""
     for stu in stu_lst:
         stri += str(stu)
@@ -169,8 +166,7 @@ def display_students():
         print "Student collection empty"
 
 def clear():
-    db.faculty.drop()
-    db.student.drop()
+    db.users.drop()
     db.appts.drop()
 
 def user_finder(uni,collection):

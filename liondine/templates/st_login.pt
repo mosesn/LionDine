@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Student Log In</title>
+  </head>
+  <body>
+    <h1>Student Log In</h1>
+    <p>If you're a member of the faculty, instead log in at <a href="./fac_login">here!</a></p>
+    <form action="./st_auth" method="post">
+      <p>
+	<label for="uni">Columbia UNI: </label>
+	<input type="text" name="uni" /><br />
+	<label for="pw">Password: </label>
+	<input type="password" name="pw" /><br />
+	<INPUT type="submit" value="Submit"> <INPUT type="reset">
+      </p>
+    </form>
+  </body>
+</html>

@@ -3,6 +3,9 @@
     <title>LionDine Event Creation</title>
   </head>
   <body>
+    <div tal:condition="exists:msg">
+      Thanks for making a meal!
+    </div>
     <h1>Create a LionDine meal here!</h1>
     <form action="./create_conf" method="post">
       <p>

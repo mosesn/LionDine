@@ -3,7 +3,9 @@
     <title>Home</title>
   </head>
   <body>
-    <h1>Student Registration</h1>
+<h1>Welcome to Columbia University LionDine</h1>
+<br>
+<h1>Student Registration</h1>
     <p>If you're a student, register <a href="./student">here!</a></p>
     <h1>Student Log In</h1>
     <p>If you're a student, log in <a href="./st_login">here!</a></p>

@@ -3,7 +3,7 @@
     <title>Home</title>
   </head>
   <body>
-<h1>Welcome to Columbia University LionDine</h1>
+Welcome to Columbia University LionDine
 <br>
 <h1>Student Registration</h1>
     <p>If you're a student, register <a href="./student">here!</a></p>

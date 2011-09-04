@@ -13,6 +13,8 @@
 	<input type="text" name="lastname" /><br />
 	<label for="uni">Columbia UNI: </label>
 	<input type="text" name="uni" /><br />
+	<label for="email">Email Address: </label>
+	<input type="text" name="email" /><br />
 	<label for="pw">Password: </label>
 	<input type="password" name="pw" /><br />
 	<INPUT type="submit" value="Send"> <INPUT type="reset">

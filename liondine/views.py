@@ -39,7 +39,7 @@ def faculty(request):
 def faculty_register(request):
     mixed = request.POST.mixed()
     try:
-        bool = faculty_signup(mixed["firstname"],mixed["lastname"],mixed["uni"])
+        bool = faculty_signup(mixed["firstname"],mixed["lastname"],mixed["uni"],mixed["email"])
         register(mixed["uni"],mixed["pw"])
         headers = remember(request,mixed["uni"])
     except ValueError: 
@@ -58,7 +58,7 @@ def student_register(request):
     mixed = request.POST.mixed()
     
     try:
-        my_bool = student_signup(mixed["firstname"],mixed["lastname"],mixed["uni"])
+        my_bool = student_signup(mixed["firstname"],mixed["lastname"],mixed["uni"], mixed["email"])
         register(mixed["uni"],mixed["pw"])
         headers = remember(request,mixed["uni"])
     except ValueError: 
@@ -113,7 +113,6 @@ def signup(request):
     db = connection.liondine
     apptment_collection = db.appts
     query = apptment_collection.find_one({"_id": ObjectId(event_id)})
-    print query
     try:
         my_bool = select_dict(authenticated_userid(request), query)
     except ValueError: 

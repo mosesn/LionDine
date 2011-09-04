@@ -1,12 +1,14 @@
 from pymongo import Connection
 from liondine.secret import MONGO_URL
-#from sendgmail import 
+from liondine.secret import PASS
+from liondine.secret import USERNAME
+from sendgmail import sendgmail
 import pymongo
 
-def faculty_signup(firstname="",lastname="",uni=""):
+def faculty_signup(firstname="",lastname="",uni="", email=""):
     connection = Connection(MONGO_URL)
     db = connection.liondine
-    if firstname and lastname and uni:
+    if firstname and lastname and uni and email:
         faculty_collection = db.users
         dup = faculty_collection.find_one({"uni":uni})
         if dup:
@@ -16,7 +18,7 @@ def faculty_signup(firstname="",lastname="",uni=""):
         else:
                 #new uni
             try:
-                faculty_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni, "type":"faculty"},safe=True)
+                faculty_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni, "type":"faculty", "email":email},safe=True)
                 return True
             except pymongo.errors.OperationFailure:
                     #pymongo problem
@@ -29,16 +31,16 @@ def faculty_signup(firstname="",lastname="",uni=""):
             #TODO
         return False
         
-def student_signup(firstname="",lastname="",uni=""):
+def student_signup(firstname="",lastname="",uni="", email=""):
     connection = Connection(MONGO_URL)
     db = connection.liondine
-    if firstname and lastname and uni:
+    if firstname and lastname and uni and email:
         student_collection = db.users
         dup = student_collection.find_one({"uni":uni})
         if dup == None:
                 #new uni
             try:
-                student_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni,"type":"student"},safe=True)
+                student_collection.insert({"firstname":firstname,"lastname":lastname,"uni":uni,"type":"student", "email":email},safe=True)
                 return True
             except pymongo.errors.OperationFailure:
                     #pymongo problem
@@ -125,11 +127,12 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
     db = connection.liondine
     if date > 0 and month > 0 and year > 0 and len(prof_uni) and len(student_uni) > 0:
         apptment_collection = db.appts
-        student_collection = db.users
+        collection = db.users
         query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni, "time": time}
         appt = apptment_collection.find_one(query)
-        student = student_collection.find_one({"uni":student_uni,"type":"student"})
-        if not student or not appt or appt["num"] == 0:
+        student = collection.find_one({"uni":student_uni,"type":"student"})
+        prof = collection.find_one({"uni":prof_uni,"type":"faculty"})
+        if not student or not appt or appt["num"] <= 0:
                 #appointment invalid
                 #TODO should be handled more gracefully
                 #redirect to registration
@@ -137,6 +140,13 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
         try:
             update = {"$push": {"students":student_uni}, "$inc":{"num" : -1}}
             apptment_collection.update(query, update, safe=True)
+            pre_body = "New meal appointment for " + appt["dur"] + " minutes at " + appt["time"] + " on " + appt["month"] + "/" + appt["date"] + "/" + appt["year"] " with "
+            prof_email = prof["email"]
+            st_email = student["email"]
+            prof_body = pre_body + student["firstname"] + " " student["lastname"] + "(" + st_email + ")"
+            st_body = pre_body + prof["firstname"] + " " prof["lastname"] + "(" + prof_email + ")"
+            sendgmail(USERNAME, PASS, prof_email, "New meal with student scheduled!", prof_body)
+            sendgmail(USERNAME, PASS, st_email, "New meal with professor scheduled!", st_body)
             return True
         except pymongo.errors.OperationFailure:
                 #pymongo problem

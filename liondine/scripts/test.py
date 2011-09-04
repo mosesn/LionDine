@@ -17,7 +17,7 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_afaculty_join(self):
         connection = Connection(MONGO_URL)
         db = connection.liondine
-        faculty_signup("Moses","Nakamura","mnn2104")
+        faculty_signup("Moses","Nakamura","mnn2104","mnn2104@columbia.edu")
         faculty_collection = db.faculty
         self.assertTrue(user_finder("mnn2104",faculty_collection))
         faculty_collection.remove({"uni":"mnn2104"})
@@ -26,7 +26,7 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_bstudent_join(self):
         connection = Connection(MONGO_URL)
         db = connection.liondine
-        student_signup("Moses","Nakamura","mnn2104")
+        student_signup("Moses","Nakamura","mnn2104", "mnn2104@columbia.edu")
         
         student_collection = db.student
         self.assertTrue(user_finder("mnn2104",student_collection))
@@ -36,16 +36,16 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_cduplicate_faculty(self):
         connection = Connection(MONGO_URL)
         db = connection.liondine
-        faculty_signup("Moses","Nakamura","mnn2104")
+        faculty_signup("Moses","Nakamura","mnn2104","mnn2104@columbia.edu")
         with self.assertRaises(ValueError):
-            faculty_signup("Moses","Nakamura","mnn2104")
+            faculty_signup("Moses","Nakamura","mnn2104","mnn2104@columbia.edu")
 
     def test_dduplicate_student(self):
         connection = Connection(MONGO_URL)
         db = connection.liondine
-        student_signup("Moses","Nakamura","mnn2104")
+        student_signup("Moses","Nakamura","mnn2104", "mnn2104@columbia.edu")
         with self.assertRaises(ValueError):
-            student_signup("Moses","Nakamura","mnn2104")
+            student_signup("Moses","Nakamura","mnn2104", "mnn2104@columbia.edu")
 
     def test_enew_appointment(self):
         connection = Connection(MONGO_URL)

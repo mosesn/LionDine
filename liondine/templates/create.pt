@@ -3,24 +3,30 @@
     <title>LionDine Event Creation</title>
   </head>
   <body>
-    <div tal:condition="exists:msg">
+    <h1>Create a LionDine meal here!</h1>
+    <div tal:condition="exists:ok">
       Thanks for making a meal!
     </div>
-    <h1>Create a LionDine meal here!</h1>
+    <div tal:condition="exists:fail">
+      There was a problem processing your meal.  Please note, all of your inputs should be integers.
+    </div>
     <form action="./create_conf" method="post">
       <p>
-	<label for="day">Date: </label>
-	<input type="text" name="date" /><br />
+	<p>An appropriate Month, Day, Year set would be 2 1 2012, ie the first of February in 2012.</p>
 	<label for="month">Month: </label>
-	<input type="text" name="month" /><br />
+	<input type="text" name="month" />
+	<label for="day">Day: </label>
+	<input type="text" name="date" />
 	<label for="year">Year: </label>
 	<input type="text" name="year" /><br />
-	<label for="num">Number: </label>
+	<label for="num">Number of Students: </label>
 	<input type="text" name="num" /><br />
 	<label for="time">Time: </label>
-	<input type="text" name="time" /><br />
+	<input type="text" name="time" />Should be in military time, ie 1300 would be 1PM
+	<br />
 	<label for="dur">Duration: </label>
-	<input type="text" name="dur" /><br />
+	<input type="text" name="dur" />Should be in minutes.
+	<br />
 	<INPUT type="submit" value="Send"> <INPUT type="reset">
       </p>
     </form>

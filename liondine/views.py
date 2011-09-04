@@ -131,7 +131,11 @@ def create(request):
     peek = request.session.peek_flash()
     if peek:
         pop = request.session.pop_flash()
-        ret_val["msg"] = pop[0]["msg"]
+        msg = pop[0]["msg"]
+        if msg == "ok":
+            ret_val["ok"] = "ok"
+        else:
+            ret_val["fail"] = "fail"
     return ret_val
 
 @view_config(route_name="create_conf", permission="create")
@@ -141,12 +145,14 @@ def create_conf(request):
         uni = authenticated_userid(request)
         my_bool = create_appointment(uni,int(mixed["date"]), int(mixed["month"]), int(mixed["year"]), int(mixed["num"]), int(mixed["time"]), int(mixed["dur"]))
     except ValueError: 
-        return HTTPFound(location="../appts")
+        peek = request.session.flash({"msg":"error"})
+        return HTTPFound(location="../create")
     if my_bool:
         peek = request.session.flash({"msg":"ok"})
         return HTTPFound(location="../create")
     else:
-        return HTTPFound(location="../appts")
+        peek = request.session.flash({"msg":"fail"})
+        return HTTPFound(location="../create")
 
 @view_config(route_name="fac_login", renderer="templates/fac_login.pt")
 def fac_login(request):

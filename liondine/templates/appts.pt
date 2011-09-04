@@ -3,8 +3,17 @@
     <title>Appointment Sign Up</title>
   </head>
   <body>
+    <div tal:condition="exists:ok">
+      Great, you signed up!
+    </div>
+    <div tal:condition="exists:fail">
+      Sorry . . . your attempt failed.
+    </div>
     <h1>Appointments</h1>
     <ul>
+      <div tal:condition="exists:empty">
+	It doesn't look like there are any appointments!
+      </div>
       <li tal:repeat="appt appts">
 	<a href="../signup/${appt['_id']}">${faculty[appt['prof_uni']][0]} ${faculty[appt['prof_uni']][1]}
 	</a>

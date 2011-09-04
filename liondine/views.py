@@ -81,11 +81,21 @@ def appointment_view(request):
         dicty[faculty["uni"]] = (faculty["firstname"], faculty["lastname"])
     
     appts = [appt for appt in appt_cursor]
-    pprint.pprint(appts)
     appts = [appt for appt in appts if appt["prof_uni"] in dicty]
     
     ret = {"appts":appts, "faculty":dicty}
-    pprint.pprint(ret)
+
+    peek = request.session.peek_flash()
+    if peek:
+        pop = request.session.pop_flash()
+        if pop[0]["msg"] == "ok":
+            ret["ok"] = "ok"
+        else:
+            ret["fail"] = "fail"
+
+    if len(appts) == 0:
+        ret["empty"] = True
+
     return ret
 
 @view_config(route_name="logout")
@@ -107,11 +117,13 @@ def signup(request):
     try:
         my_bool = select_dict(authenticated_userid(request), query)
     except ValueError: 
+        request.session.flash({"msg":"error"})
         return HTTPFound(location="../appts")
     if my_bool:
-        return {"msg":"ok"}
+        request.session.flash({"msg":"ok"})
     else:
-        return HTTPFound(location="../appts")
+        request.session.flash({"msg":"fail"})
+    return HTTPFound(location="../appts")
 
 @view_config(route_name="create", renderer="templates/create.pt", permission = "create")
 def create(request):

@@ -21,7 +21,7 @@ def connect(server, username, password):
 def getmessage(sender, recipient, subject, body):
     msg = MIMEText(body)
     msg['Subject'] = subject
-    msg['From'] = username+'@gmail.com'
+    msg['From'] = sender
     msg['To'] = recipient
     return msg
 

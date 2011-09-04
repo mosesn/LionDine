@@ -4,6 +4,7 @@ from liondine.secret import PASS
 from liondine.secret import USERNAME
 from sendgmail import sendgmail
 import pymongo
+import pprint
 
 def faculty_signup(firstname="",lastname="",uni="", email=""):
     connection = Connection(MONGO_URL)
@@ -131,7 +132,9 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
         query = {"date":date, "month":month, "year":year, "prof_uni" : prof_uni, "time": time}
         appt = apptment_collection.find_one(query)
         student = collection.find_one({"uni":student_uni,"type":"student"})
+        pprint.pprint(student)
         prof = collection.find_one({"uni":prof_uni,"type":"faculty"})
+        pprint.pprint(prof)
         if not student or not appt or appt["num"] <= 0:
                 #appointment invalid
                 #TODO should be handled more gracefully
@@ -140,11 +143,13 @@ def select_appointment(uni, date = 0, month = 0, year = 0, prof_uni = "", time =
         try:
             update = {"$push": {"students":student_uni}, "$inc":{"num" : -1}}
             apptment_collection.update(query, update, safe=True)
-            pre_body = "New meal appointment for " + appt["dur"] + " minutes at " + appt["time"] + " on " + appt["month"] + "/" + appt["date"] + "/" + appt["year"] " with "
+            pre_body = "New meal appointment for " + str(appt["dur"]) + " minutes at " + str(appt["time"]) + " on " + str(appt["month"]) + "/" + str(appt["date"]) + "/" + str(appt["year"]) + " with "
             prof_email = prof["email"]
             st_email = student["email"]
-            prof_body = pre_body + student["firstname"] + " " student["lastname"] + "(" + st_email + ")"
-            st_body = pre_body + prof["firstname"] + " " prof["lastname"] + "(" + prof_email + ")"
+            prof_body = pre_body + student["firstname"] + " " +  student["lastname"] + " (" + st_email + ")."
+            st_body = pre_body + prof["firstname"] + " " + prof["lastname"] + " (" + prof_email + ")."
+            pprint.pprint(st_body)
+            pprint.pprint(prof_body)
             sendgmail(USERNAME, PASS, prof_email, "New meal with student scheduled!", prof_body)
             sendgmail(USERNAME, PASS, st_email, "New meal with professor scheduled!", st_body)
             return True

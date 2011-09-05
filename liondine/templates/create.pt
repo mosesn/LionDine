@@ -30,5 +30,8 @@
 	<INPUT type="submit" value="Send"> <INPUT type="reset">
       </p>
     </form>
+    <a href="../logout">
+      Logout
+    </a>
   </body>
 </html>

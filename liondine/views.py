@@ -27,13 +27,11 @@ def view_model(context, request):
 
 @view_config(route_name="home", renderer="templates/home.pt")
 def home(request):
-#    print authenticated_userid(request)
-    print effective_principals(request)
-    return {}
+    return redirect_authenticated({}, request)
 
 @view_config(route_name="faculty", renderer="templates/faculty.pt")
 def faculty(request):
-    return {}
+    return redirect_authenticated({}, request)
 
 @view_config(route_name="faculty_register", renderer="templates/faculty_reg.pt")
 def faculty_register(request):
@@ -51,7 +49,7 @@ def faculty_register(request):
 
 @view_config(route_name="student", renderer="templates/student.pt")
 def student(request):
-    return {}
+    return redirect_authenticated({}, request)
 
 @view_config(route_name="student_register", renderer="templates/student_reg.pt")
 def student_register(request):
@@ -155,7 +153,7 @@ def create_conf(request):
 
 @view_config(route_name="fac_login", renderer="templates/fac_login.pt")
 def fac_login(request):
-    return {}
+    return redirect_authenticated({}, request)
 
 @view_config(route_name="fac_auth")
 def fac_auth(request):
@@ -168,7 +166,7 @@ def fac_auth(request):
 
 @view_config(route_name="st_login", renderer="templates/st_login.pt")
 def st_login(request):
-    return {}
+    return redirect_authenticated({}, request)
 
 @view_config(route_name="st_auth")
 def st_auth(request):
@@ -187,3 +185,16 @@ def register(username, pw):
     auth_coll = Connection(MONGO_URL).liondine.auth
     auth = Mongauth(auth_coll)
     return auth.new(username,pw)
+
+def redirect_authenticated(other, request):
+    user = authenticated_userid(request)
+    if user:
+        user_type = Connection(MONGO_URL).liondine.users.find_one({"uni":user})["type"]
+        if user_type == "faculty":
+            return HTTPFound(location="../create")
+        elif user_type == "student":
+            return HTTPFound(location="../appts")
+        else:
+            return other
+    else:
+        return other

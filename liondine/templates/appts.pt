@@ -25,5 +25,8 @@
 	Duration: ${appt["dur"]}
       </li>
     </ul>
+    <a href="../logout">
+      Logout
+    </a>
   </body>
 </html>

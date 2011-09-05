@@ -4,6 +4,16 @@
   </head>
   <body>
     <h1>Student Registration</h1>
+    <div tal:condition="exists:dup">
+      <p>
+	You may not create a user with a duplicate uni.
+      </p>
+    </div>
+    <div tal:condition="exists:err">
+      <p>
+	You might have forgotten to fill in a field!  Every field needs to be filled out.
+      </p>
+    </div>
     <p>If you're a member of the faculty, instead join <a href="./faculty">here!</a></p>
     <form action="./student_join" method="post">
       <p>

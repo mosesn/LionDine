@@ -4,6 +4,11 @@
   </head>
   <body>
     <h1>Student Log In</h1>
+    <div tal:condition="exists:err">
+      <p>
+	There was a problem with your UNI/Password combination.  Please try again.
+      </p>
+    </div>
     <p>If you're a member of the faculty, instead log in at <a href="./fac_login">here!</a></p>
     <form action="./st_auth" method="post">
       <p>

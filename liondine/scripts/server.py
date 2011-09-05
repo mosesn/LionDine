@@ -5,10 +5,16 @@ from liondine.secret import USERNAME
 from sendgmail import sendgmail
 import pymongo
 
+def valid(firstname,lastname,uni,email):
+    if firstname and lastname and uni and email:
+        if firstname != "" and lastname != "" and uni != "" and email != "":
+            return True
+    return False
+
 def faculty_signup(firstname="",lastname="",uni="", email=""):
     connection = Connection(MONGO_URL)
     db = connection.liondine
-    if firstname and lastname and uni and email:
+    if valid(firstname,lastname,uni,email):
         faculty_collection = db.users
         dup = faculty_collection.find_one({"uni":uni})
         if dup:
@@ -34,7 +40,7 @@ def faculty_signup(firstname="",lastname="",uni="", email=""):
 def student_signup(firstname="",lastname="",uni="", email=""):
     connection = Connection(MONGO_URL)
     db = connection.liondine
-    if firstname and lastname and uni and email:
+    if valid(firstname, lastname, uni, email):
         student_collection = db.users
         dup = student_collection.find_one({"uni":uni})
         if dup == None:

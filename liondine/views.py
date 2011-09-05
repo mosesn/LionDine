@@ -31,25 +31,43 @@ def home(request):
 
 @view_config(route_name="faculty", renderer="templates/faculty.pt")
 def faculty(request):
-    return redirect_authenticated({}, request)
+    ret = {}
+    peek = request.session.peek_flash()
+    if peek:
+        pop = request.session.pop_flash()
+        if pop[0]["msg"] == "err":
+            ret["err"] = "err"
+        elif pop[0]["msg"] == "dup":
+            ret["dup"] = "dup"
+    return redirect_authenticated(ret, request)
 
 @view_config(route_name="faculty_register", renderer="templates/faculty_reg.pt")
 def faculty_register(request):
     mixed = request.POST.mixed()
     try:
         bool = faculty_signup(mixed["firstname"],mixed["lastname"],mixed["uni"],mixed["email"])
-        register(mixed["uni"],mixed["pw"])
-        headers = remember(request,mixed["uni"])
     except ValueError: 
+        request.session.flash({"msg":"dup"})
         return HTTPFound(location="../faculty")
     if bool:
+        register(mixed["uni"],mixed["pw"])
+        headers = remember(request,mixed["uni"])
         return HTTPFound(location="../create", headers=headers)
     else:
+        request.session.flash({"msg":"err"})
         return HTTPFound(location="../faculty")
 
 @view_config(route_name="student", renderer="templates/student.pt")
 def student(request):
-    return redirect_authenticated({}, request)
+    ret = {}
+    peek = request.session.peek_flash()
+    if peek:
+        pop = request.session.pop_flash()
+        if pop[0]["msg"] == "err":
+            ret["err"] = "err"
+        elif pop[0]["msg"] == "dup":
+            ret["dup"] = "dup"
+    return redirect_authenticated(ret, request)
 
 @view_config(route_name="student_register", renderer="templates/student_reg.pt")
 def student_register(request):
@@ -57,13 +75,15 @@ def student_register(request):
     
     try:
         my_bool = student_signup(mixed["firstname"],mixed["lastname"],mixed["uni"], mixed["email"])
+    except ValueError: 
         register(mixed["uni"],mixed["pw"])
         headers = remember(request,mixed["uni"])
-    except ValueError: 
+        request.session.flash({"msg":"dup"})
         return HTTPFound(location="../student")
     if my_bool:
         return HTTPFound(location="../appts", headers=headers)
     else:
+        request.session.flash({"msg":"err"})
         return HTTPFound(location="../student")
 
 @view_config(route_name="appts", renderer="templates/appts.pt", permission="register")
@@ -153,7 +173,13 @@ def create_conf(request):
 
 @view_config(route_name="fac_login", renderer="templates/fac_login.pt")
 def fac_login(request):
-    return redirect_authenticated({}, request)
+    ret = {}
+    peek = request.session.peek_flash()
+    if peek:
+        pop = request.session.pop_flash()
+        if pop[0]["msg"] == "err":
+            ret["err"] = "err"
+    return redirect_authenticated(ret, request)
 
 @view_config(route_name="fac_auth")
 def fac_auth(request):
@@ -162,11 +188,18 @@ def fac_auth(request):
         headers = remember(request,mixed["uni"])
         return HTTPFound(location="../create", headers=headers)
     else:
-        return HTTPFound(location="../st_login")
+        request.session.flash({"msg":"err"})
+        return HTTPFound(location="../fac_login")
 
 @view_config(route_name="st_login", renderer="templates/st_login.pt")
 def st_login(request):
-    return redirect_authenticated({}, request)
+    ret = {}
+    peek = request.session.peek_flash()
+    if peek:
+        pop = request.session.pop_flash()
+        if pop[0]["msg"] == "err":
+            ret["err"] = "err"
+    return redirect_authenticated(ret, request)
 
 @view_config(route_name="st_auth")
 def st_auth(request):
@@ -175,6 +208,7 @@ def st_auth(request):
         headers = remember(request,mixed["uni"])
         return HTTPFound(location="../appts", headers=headers)
     else:
+        request.session.flash({"msg":"err"})
         return HTTPFound(location="../st_login")
 
 def auth(username, pw):

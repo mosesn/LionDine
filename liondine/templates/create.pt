@@ -5,7 +5,7 @@
   <body>
     <h1>Create a LionDine meal here!</h1>
     <div tal:condition="exists:ok">
-      Thanks for making a meal!
+      Thanks for making a meal!  You'll be receiving an email from emailsenderbot@gmail.com when someone registers for your email.  It is a bot, so mail services often register it as spam.  Please add it to your whitelist, so that you can receive message from it!  If you forget and it does end up in your spam, please mark it as not spam so that your filter can fix its filters.
     </div>
     <div tal:condition="exists:fail">
       There was a problem processing your meal.  Please note, all of your inputs should be integers.

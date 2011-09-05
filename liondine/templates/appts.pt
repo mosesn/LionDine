@@ -4,7 +4,7 @@
   </head>
   <body>
     <div tal:condition="exists:ok">
-      Great, you signed up!
+      Great, you signed up! You'll be receiving an email from emailsenderbot@gmail.com immediately.  It is a bot, so mail services often register it as spam--if you don't see it immediately, check your spam box.  Please add it to your whitelist, so that you can receive message from it!  If you forget and it does end up in your spam, please mark it as not spam so that your spam filter can fix its filters.
     </div>
     <div tal:condition="exists:fail">
       Sorry . . . your attempt failed.

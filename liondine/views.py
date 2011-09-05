@@ -29,8 +29,8 @@ def view_model(context, request):
 def home(request):
     return redirect_authenticated({}, request)
 
-@view_config(route_name="faculty", renderer="templates/faculty.pt")
-def faculty(request):
+@view_config(route_name="register", renderer="templates/register.pt")
+def register(request):
     ret = {}
     peek = request.session.peek_flash()
     if peek:
@@ -41,50 +41,49 @@ def faculty(request):
             ret["dup"] = "dup"
     return redirect_authenticated(ret, request)
 
-@view_config(route_name="faculty_register", renderer="templates/faculty_reg.pt")
+@view_config(route_name="join")
+def join(request):
+    mixed = request.POST.mixed()
+    if "type" in mixed:
+        if (mixed["type"]) == "faculty":
+            return faculty_register(request)
+        elif (mixed["type"]) == "student":
+            return student_register(request)
+        else:
+            raise ValueError("Bad type value!")
+    else:
+        request.session.flash({"msg":"err"})
+        return HTTPFound(location="../register")
+
 def faculty_register(request):
     mixed = request.POST.mixed()
     try:
         bool = faculty_signup(mixed["firstname"],mixed["lastname"],mixed["uni"],mixed["email"])
     except ValueError: 
         request.session.flash({"msg":"dup"})
-        return HTTPFound(location="../faculty")
+        return HTTPFound(location="../register")
     if bool:
-        register(mixed["uni"],mixed["pw"])
+        registern(mixed["uni"],mixed["pw"])
         headers = remember(request,mixed["uni"])
         return HTTPFound(location="../create", headers=headers)
     else:
         request.session.flash({"msg":"err"})
-        return HTTPFound(location="../faculty")
+        return HTTPFound(location="../register")
 
-@view_config(route_name="student", renderer="templates/student.pt")
-def student(request):
-    ret = {}
-    peek = request.session.peek_flash()
-    if peek:
-        pop = request.session.pop_flash()
-        if pop[0]["msg"] == "err":
-            ret["err"] = "err"
-        elif pop[0]["msg"] == "dup":
-            ret["dup"] = "dup"
-    return redirect_authenticated(ret, request)
-
-@view_config(route_name="student_register", renderer="templates/student_reg.pt")
 def student_register(request):
     mixed = request.POST.mixed()
-    
     try:
         my_bool = student_signup(mixed["firstname"],mixed["lastname"],mixed["uni"], mixed["email"])
     except ValueError: 
-        register(mixed["uni"],mixed["pw"])
+        registern(mixed["uni"],mixed["pw"])
         headers = remember(request,mixed["uni"])
         request.session.flash({"msg":"dup"})
-        return HTTPFound(location="../student")
+        return HTTPFound(location="../register")
     if my_bool:
         return HTTPFound(location="../appts", headers=headers)
     else:
         request.session.flash({"msg":"err"})
-        return HTTPFound(location="../student")
+        return HTTPFound(location="../register")
 
 @view_config(route_name="appts", renderer="templates/appts.pt", permission="register")
 def appointment_view(request):
@@ -215,8 +214,8 @@ def create_conf(request):
         peek = request.session.flash({"msg":"fail"})
         return HTTPFound(location="../create")
 
-@view_config(route_name="fac_login", renderer="templates/fac_login.pt")
-def fac_login(request):
+@view_config(route_name="login", renderer="templates/login.pt")
+def login(request):
     ret = {}
     peek = request.session.peek_flash()
     if peek:
@@ -225,41 +224,27 @@ def fac_login(request):
             ret["err"] = "err"
     return redirect_authenticated(ret, request)
 
-@view_config(route_name="fac_auth")
-def fac_auth(request):
+@view_config(route_name="auth")
+def auth(request):
     mixed = request.POST.mixed()
-    if auth(mixed["uni"],mixed["pw"]):
+    if authn(mixed["uni"],mixed["pw"]):
         headers = remember(request,mixed["uni"])
-        return HTTPFound(location="../fac_appts", headers=headers)
+        user_type = Connection(MONGO_URL).liondine.users.find_one({"uni":mixed["uni"]})["type"]
+        if user_type == "faculty":
+            return HTTPFound(location="../fac_appts", headers=headers)
+        elif user_type == "student":
+            return HTTPFound(location="../st_appts", headers=headers)
+        else:
+            return HTTPFound(location="..", headers=headers)
     else:
         request.session.flash({"msg":"err"})
-        return HTTPFound(location="../fac_login")
+        return HTTPFound(location="../login")
 
-@view_config(route_name="st_login", renderer="templates/st_login.pt")
-def st_login(request):
-    ret = {}
-    peek = request.session.peek_flash()
-    if peek:
-        pop = request.session.pop_flash()
-        if pop[0]["msg"] == "err":
-            ret["err"] = "err"
-    return redirect_authenticated(ret, request)
-
-@view_config(route_name="st_auth")
-def st_auth(request):
-    mixed = request.POST.mixed()
-    if auth(mixed["uni"],mixed["pw"]):
-        headers = remember(request,mixed["uni"])
-        return HTTPFound(location="../st_appts", headers=headers)
-    else:
-        request.session.flash({"msg":"err"})
-        return HTTPFound(location="../st_login")
-
-def auth(username, pw):
+def authn(username, pw):
     auth = Mongauth(Connection(MONGO_URL).liondine.auth)
     return auth.auth(username,pw)
 
-def register(username, pw):
+def registern(username, pw):
     auth_coll = Connection(MONGO_URL).liondine.auth
     auth = Mongauth(auth_coll)
     return auth.new(username,pw)

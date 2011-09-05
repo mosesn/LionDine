@@ -1,9 +1,9 @@
 <html>
   <head>
-    <title>Student Sign Up</title>
+    <title>Registration</title>
   </head>
   <body>
-    <h1>Student Registration</h1>
+    <h1>Registration</h1>
     <div tal:condition="exists:dup">
       <p>
 	You may not create a user with a duplicate uni.
@@ -14,8 +14,7 @@
 	You might have forgotten to fill in a field!  Every field needs to be filled out.
       </p>
     </div>
-    <p>If you're a member of the faculty, instead join <a href="./faculty">here!</a></p>
-    <form action="./student_join" method="post">
+    <form action="./join" method="post">
       <p>
 	<label for="firstname">First Name: </label>
 	<input type="text" name="firstname" /><br />
@@ -27,6 +26,11 @@
 	<input type="text" name="email" /><br />
 	<label for="pw">Password: </label>
 	<input type="password" name="pw" /><br />
+	<label for="type">Type: </label>
+	Faculty
+	<input type="radio" name="type" value="faculty" /><br />
+	Student
+	<input type="radio" name="type" value="student" /><br />
 	<INPUT type="submit" value="Send"> <INPUT type="reset">
       </p>
     </form>

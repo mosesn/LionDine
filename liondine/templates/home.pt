@@ -3,13 +3,15 @@
     <title>Home</title>
   </head>
   <body>
-    <h1>Student Registration</h1>
+Welcome to Columbia University LionDine
+<br>
+<h1>Student Registration</h1>
     <p>If you're a student, register <a href="./student">here!</a></p>
     <h1>Student Log In</h1>
-    <p>If you're a student, log in <a href="./st_login">here!</a></p>
+    <p>If you're a student, login <a href="./st_login">here!</a></p>
     <h1>Faculty Registration</h1>
     <p>If you're a member of the faculty, register <a href="./faculty">here!</a></p>
     <h1>Faculty Log In</h1>
-    <p>If you're a member of the faculty, log in at <a href="./fac_login">here!</a></p>
+    <p>If you're a member of the faculty, login at <a href="./fac_login">here!</a></p>
   </body>
 </html>

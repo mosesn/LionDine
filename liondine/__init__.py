@@ -45,6 +45,7 @@ def main(global_config, **settings):
     config.add_route('faculty', '/faculty')
     config.add_route('faculty_register', '/faculty_join')
     config.add_route('create', '/create')
+    config.add_route('fac_appts', '/fac_appts')
     config.add_route('signup', '/signup/{mongoid}')
     config.add_route('create_conf', '/create_conf')
     config.scan("liondine")

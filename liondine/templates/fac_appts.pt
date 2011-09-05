@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>Appointment Sign Up</title>
+  </head>
+  <body>
+    <div tal:condition="exists:ok">
+      Great, you signed up! You'll be receiving an email from emailsenderbot@gmail.com immediately.  It is a bot, so mail services often register it as spam--if you don't see it immediately, check your spam box.  Please add it to your whitelist, so that you can receive message from it!  If you forget and it does end up in your spam, please mark it as not spam so that your spam filter can fix its filters.
+    </div>
+    <div tal:condition="exists:fail">
+      Sorry . . . your attempt failed.
+    </div>
+    <h1>Appointments</h1>
+    <ul>
+      <div tal:condition="exists:empty">
+	It doesn't look like there are any appointments!
+      </div>
+      <li tal:repeat="appt appts">
+	Day: ${appt["month"]}/${appt["date"]}/${appt["year"]}
+	<br />
+	Time: ${appt["time"]}
+	<br />
+	Duration: ${appt["dur"]}
+	<br />
+	Number of spots left: ${appt["num"]}
+      </li>
+    </ul>
+    <a href="../create">
+      Create an Appointment
+    </a>
+    <br />
+    <a href="../logout">
+      Logout
+    </a>
+  </body>
+</html>

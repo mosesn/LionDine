@@ -138,6 +138,28 @@ def faculty_appointments(request):
 
     return ret
 
+@view_config(route_name="st_appts", renderer="templates/st_appts.pt", permission="register")
+def student_appointments(request):
+    connection = Connection(MONGO_URL)
+    db = connection.liondine
+    apptment_collection = db.appts
+    appt_cursor = apptment_collection.find({"students":authenticated_userid(request)})
+    collection = db.users
+    faculty_cursor = collection.find({"type":"faculty"})
+    dicty = {}
+    for faculty in faculty_cursor:
+        dicty[faculty["uni"]] = (faculty["firstname"], faculty["lastname"])
+    
+    appts = [appt for appt in appt_cursor]
+    appts = [appt for appt in appts if appt["prof_uni"] in dicty]
+    
+    ret = {"appts":appts, "faculty":dicty}
+
+    if len(appts) == 0:
+        ret["empty"] = True
+
+    return ret
+
 @view_config(route_name="logout")
 def logout(request):
     headers = forget(request)
@@ -228,7 +250,7 @@ def st_auth(request):
     mixed = request.POST.mixed()
     if auth(mixed["uni"],mixed["pw"]):
         headers = remember(request,mixed["uni"])
-        return HTTPFound(location="../appts", headers=headers)
+        return HTTPFound(location="../st_appts", headers=headers)
     else:
         request.session.flash({"msg":"err"})
         return HTTPFound(location="../st_login")
@@ -249,7 +271,7 @@ def redirect_authenticated(other, request):
         if user_type == "faculty":
             return HTTPFound(location="../fac_appts")
         elif user_type == "student":
-            return HTTPFound(location="../appts")
+            return HTTPFound(location="../st_appts")
         else:
             return other
     else:

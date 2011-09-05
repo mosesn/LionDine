@@ -22,6 +22,15 @@
 	Duration: ${appt["dur"]}
 	<br />
 	Number of spots left: ${appt["num"]}
+	<br />
+	<div tal:condition="exists:appt['students']">
+	  Students already signed up: 
+	  <ul tal:repeat="student appt['students']">
+	    <li>
+	      ${student}
+	    </li>
+	  </ul>
+	</div>
       </li>
     </ul>
     <a href="../create">

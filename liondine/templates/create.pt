@@ -30,6 +30,10 @@
 	<INPUT type="submit" value="Send"> <INPUT type="reset">
       </p>
     </form>
+    <a href="../fac_appts">
+      See your Appointments
+    </a>
+    <br />
     <a href="../logout">
       Logout
     </a>

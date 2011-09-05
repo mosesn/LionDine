@@ -15,9 +15,6 @@
 	It doesn't look like there are any appointments!
       </div>
       <li tal:repeat="appt appts">
-	<a href="../signup/${appt['_id']}">${faculty[appt['prof_uni']][0]} ${faculty[appt['prof_uni']][1]}
-	</a>
-	<br />
 	Day: ${appt["month"]}/${appt["date"]}/${appt["year"]}
 	<br />
 	Time: ${appt["time"]}
@@ -27,8 +24,8 @@
 	Number of spots left: ${appt["num"]}
       </li>
     </ul>
-    <a href="../st_appts">
-      See your Appointments
+    <a href="../appts">
+      Select an Appointment
     </a>
     <br />
     <a href="../logout">

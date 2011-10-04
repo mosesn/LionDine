@@ -75,11 +75,11 @@ def student_register(request):
     try:
         my_bool = student_signup(mixed["firstname"],mixed["lastname"],mixed["uni"], mixed["email"])
     except ValueError: 
-        registern(mixed["uni"],mixed["pw"])
-        headers = remember(request,mixed["uni"])
         request.session.flash({"msg":"dup"})
         return HTTPFound(location="../register")
     if my_bool:
+        registern(mixed["uni"],mixed["pw"])
+        headers = remember(request,mixed["uni"])
         return HTTPFound(location="../appts", headers=headers)
     else:
         request.session.flash({"msg":"err"})

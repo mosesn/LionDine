@@ -7,7 +7,7 @@
     <br />
     <h1>Registration</h1>
     <p>Register <a href="./register">here!</a></p>
-    <h1>Faculty Log In</h1>
+    <h1>Log In</h1>
     <p>Login <a href="./login">here!</a></p>
   </body>
 </html>
